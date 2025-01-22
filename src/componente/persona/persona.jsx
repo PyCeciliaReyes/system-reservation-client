@@ -223,7 +223,7 @@ export const Persona = () => {
                 <td className="border p-2 flex justify-center space-x-2">
                   <button
                     onClick={() => handleEdit(persona)}
-                    className="bg-blue-500 text-white py-1 px-2 rounded"
+                    className="bg-blue-600 text-white py-1 px-2 rounded"
                   >
                     Editar
                   </button>
