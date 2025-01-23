@@ -198,6 +198,7 @@ export const Reserva = () => {
               <th className="border p-2">Salida</th>
               <th className="border p-2">Habitacion</th>
               <th className="border p-2">Persona</th>
+              <th className="border p-2">Monto</th>
               <th className="border p-2">Acciones</th>
             </tr>
           </thead>
@@ -208,7 +209,8 @@ export const Reserva = () => {
                 <td className="border p-2">{reserva.fechaentrada}</td>
                 <td className="border p-2">{reserva.fechasalida}</td>
                 <td className="border p-2">{reserva.habitacionid}</td>
-                <td className="border p-2">{reserva.personaid}</td>
+                <td className="border p-2">{reserva.persona.nombrecompleto}</td>
+                <td className="border p-2">{reserva.montoreserva}</td>
                 <td className="border p-2 flex justify-center space-x-2">
                   <button
                     onClick={() => handleEdit(reserva)}
