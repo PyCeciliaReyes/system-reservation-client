@@ -49,7 +49,7 @@ export const App = () => {
             <Route path="/persona" element={<Persona />} />
             <Route path="/habitacion" element={<Habitacion />} />
             <Route path="/reserva" element={<Reserva />} />
-            <Route path="/" element={<h1>Bienvenido al sistema de reservas</h1>} />
+            <Route path="/" element={<h1 className='text-2xl font-bold mb-4'>Bienvenido al sistema de reservas</h1>} />
           </Routes>
         </main>
       </div>
