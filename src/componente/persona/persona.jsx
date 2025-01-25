@@ -60,14 +60,15 @@ export const Persona = () => {
       body: JSON.stringify(formData),
     })
       .then((response) => {
+        // Verificar si el estado HTTP indica un error (400 o similar)
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          return response.json().then((errorData) => {
+            throw new Error(errorData.message || 'Error en la solicitud.');
+          });
         }
-        return response.json();
+        return response.json(); // Procesar respuesta exitosa
       })
       .then((responseData) => {
-        //console.log('Respuesta del servidor:', responseData);
-  
         if (responseData.status === 'success') {
           const nuevaPersona = responseData.data;
   
@@ -94,13 +95,12 @@ export const Persona = () => {
             telefono: '',
           });
           setIsEditing(false);
-        } else {
-          alert('Ocurrio un error: ' + (responseData.message || 'Operacion fallida.'));
         }
       })
       .catch((error) => {
+        // Mostrar el mensaje del backend o un mensaje genérico
         console.error('Error al guardar persona:', error);
-        alert('Ocurrió un error inesperado. Inténtalo nuevamente.');
+        alert(error.message || 'Ocurrió un error inesperado. Inténtalo nuevamente.');
       });
   };  
 

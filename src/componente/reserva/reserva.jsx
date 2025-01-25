@@ -51,8 +51,62 @@ export const Reserva = () => {
   // Manejar cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
+  
+    // Actualizar el estado del formulario
     setFormData({ ...formData, [name]: value });
-  };
+  
+    // Si el usuario selecciona ambas fechas, validar y calcular el monto
+    if (name === 'fechaentrada' || name === 'fechasalida') {
+      const { fechaentrada, fechasalida } = {
+        ...formData,
+        [name]: value, // Actualizar la fecha seleccionada
+      };
+  
+      // Validar que ambas fechas estén completas
+      if (fechaentrada && fechasalida) {
+        // Validar que fechaentrada sea anterior a fechasalida
+        if (new Date(fechaentrada) >= new Date(fechasalida)) {
+          alert('La fecha de entrada debe ser anterior a la fecha de salida.');
+          return;
+        }
+  
+        // Construir la URL con parámetros
+        const params = new URLSearchParams({
+          fechaentrada,
+          fechasalida,
+        });
+  
+        // Llamar al endpoint con fechas como parámetros
+        fetch(`${API_URL}/api/reserva/calcular-monto?${params.toString()}`, {
+          method: 'GET',
+          headers: getHeaders(),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then((errorData) => {
+                throw new Error(errorData.message || 'Error al calcular el monto.');
+              });
+            }
+            return response.json();
+          })
+          .then((responseData) => {
+            if (responseData.status === 'success') {
+              // Actualizar el monto calculado en el estado
+              setFormData((prev) => ({
+                ...prev,
+                monto: responseData.data.monto,
+              }));
+            } else {
+              throw new Error(responseData.message || 'Error al calcular el monto.');
+            }
+          })
+          .catch((error) => {
+            console.error('Error al calcular el monto:', error);
+            alert(error.message || 'Ocurrió un error al calcular el monto.');
+          });
+      }
+    }
+  };    
 
   // Crear o editar reserva
   const handleSubmit = (e) => {
@@ -68,7 +122,19 @@ export const Reserva = () => {
       headers: getHeaders(),
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        // Verificar si la respuesta HTTP no es exitosa (4xx, 5xx)
+        if (!response.ok) {
+          return response.json().then((errorData) => {
+            // Lanzar un error con los mensajes del backend
+            const errorMessages = errorData.errors
+              ? errorData.errors.map((err) => err.msg).join('\n')
+              : errorData.message || 'Error desconocido';
+            throw new Error(errorMessages);
+          });
+        }
+        return response.json(); // Procesar respuesta exitosa
+      })
       .then((responseData) => {
         if (responseData.status === 'success') {
           const nuevaReserva = responseData.data;
@@ -96,11 +162,13 @@ export const Reserva = () => {
             personaid: '',
           });
           setIsEditing(false);
-        } else {
-          alert('Error: ' + (responseData.message || 'Operacion fallida'));
         }
       })
-      .catch((error) => console.error('Error al guardar reserva:', error));
+      .catch((error) => {
+        // Mostrar los mensajes de error en una alerta
+        console.error('Error al guardar reserva:', error);
+        alert(error.message || 'Ocurrió un error inesperado. Inténtalo nuevamente.');
+      });
   };
 
   // Eliminar reserva
@@ -141,22 +209,28 @@ export const Reserva = () => {
           {isEditing ? 'Editar Reserva' : 'Crear Reserva'}
         </h2>
         <div className="grid grid-cols-2 gap-4">
-          <input
-            type="date"
-            name="fechaentrada"
-            value={formData.fechaentrada}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="date"
-            name="fechasalida"
-            value={formData.fechasalida}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
-          />
+          <div className='flex flex-col'>
+            <label className=''>Fecha de Entrada:</label>
+            <input
+              type="date"
+              name="fechaentrada"
+              value={formData.fechaentrada}
+              onChange={handleChange}
+              className="p-2 border rounded"
+              required
+            />
+          </div>
+          <div className='flex flex-col'>
+            <label className=''>Fecha de Salida:</label>
+            <input
+              type="date"
+              name="fechasalida"
+              value={formData.fechasalida}
+              onChange={handleChange}
+              className="p-2 border rounded"
+              required
+            />
+          </div>
           <select
             name="personaid"
             value={formData.personaid}
@@ -185,6 +259,15 @@ export const Reserva = () => {
               </option>
             ))}
           </select>
+           {/* Campo Monto */}
+          <input
+            type="text"
+            name="monto"
+            value={formData.monto || ''}
+            readOnly
+            placeholder="Monto calculado"
+            className="p-2 border rounded bg-gray-100"
+          />
         </div>
         <button
           type="submit"
