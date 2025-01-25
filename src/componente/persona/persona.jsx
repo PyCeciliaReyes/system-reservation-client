@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import {API_URL, getHeaders} from '../../utils/api';
 
 export const Persona = () => {
-  const API_URL = import.meta.env.VITE_URL;
   const [personas, setPersonas] = useState([]); // Lista de personas
   const [formData, setFormData] = useState({
     id: null,
@@ -16,7 +16,10 @@ export const Persona = () => {
   // Obtener todas las personas al cargar el componente
   useEffect(() => {
     setLoading(true); // Activar estado cargando
-    fetch(`${API_URL}/api/persona`)
+    fetch(`${API_URL}/api/persona`, {
+      method: 'GET',
+      headers: getHeaders(),
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Error en la solicitud');
@@ -53,7 +56,7 @@ export const Persona = () => {
   
     fetch(endpoint, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify(formData),
     })
       .then((response) => {
@@ -104,7 +107,7 @@ export const Persona = () => {
   // Eliminar persona
   const handleDelete = (id) => {
   if (window.confirm(`¿Estas seguro de que deseas eliminar la persona con ID: ${id}?`)) {
-    fetch(`${API_URL}/api/persona/${id}`, { method: 'DELETE' })
+    fetch(`${API_URL}/api/persona/${id}`, { method: 'DELETE', headers: getHeaders() })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

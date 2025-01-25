@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import {API_URL, getHeaders} from '../../utils/api';
 
 export const Reserva = () => {
-  const API_URL = import.meta.env.VITE_URL;
   const [reservas, setReservas] = useState([]); // Lista de reservas
   const [personas, setPersonas] = useState([]); // Lista de personas para selección
   const [habitaciones, setHabitaciones] = useState([]); // Lista de habitaciones para selección
@@ -20,9 +20,18 @@ export const Reserva = () => {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      fetch(`${API_URL}/api/reserva`).then((res) => res.json()),
-      fetch(`${API_URL}/api/persona`).then((res) => res.json()),
-      fetch(`${API_URL}/api/habitacion`).then((res) => res.json()),
+      fetch(`${API_URL}/api/reserva`,{
+        method: 'GET',
+        headers: getHeaders(),
+      }).then((res) => res.json()),
+      fetch(`${API_URL}/api/persona`,{
+        method: 'GET',
+        headers: getHeaders(),
+      }).then((res) => res.json()),
+      fetch(`${API_URL}/api/habitacion`,{
+        method: 'GET',
+        headers: getHeaders(),
+      }).then((res) => res.json()),
     ])
       .then(([reservasResponse, personasResponse, habitacionesResponse]) => {
         if (reservasResponse.status === 'success') {
@@ -56,7 +65,7 @@ export const Reserva = () => {
 
     fetch(endpoint, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify(formData),
     })
       .then((response) => response.json())
@@ -97,7 +106,7 @@ export const Reserva = () => {
   // Eliminar reserva
   const handleDelete = (id) => {
     if (window.confirm(`¿Estas seguro de que deseas eliminar la reserva con ID: ${id}?`)) {
-      fetch(`${API_URL}/api/reserva/${id}`, { method: 'DELETE' })
+      fetch(`${API_URL}/api/reserva/${id}`, { method: 'DELETE', headers: getHeaders() })
         .then((response) => response.json())
         .then((responseData) => {
           if (responseData.status === 'success') {

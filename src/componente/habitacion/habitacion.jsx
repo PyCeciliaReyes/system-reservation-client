@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import {API_URL, getHeaders} from '../../utils/api';
 
 export const Habitacion = () => {
-  const API_URL = import.meta.env.VITE_URL;
   const [habitaciones, setHabitaciones] = useState([]); // Lista de habitaciones
   const [formData, setFormData] = useState({
     id: null,
@@ -17,7 +17,10 @@ export const Habitacion = () => {
   // Obtener todas las habitaciones al cargar el componente
   useEffect(() => {
     setLoading(true);
-    fetch(`${API_URL}/api/habitacion`)
+    fetch(`${API_URL}/api/habitacion`,{
+      method: 'GET',
+      headers: getHeaders(),
+    })
       .then((response) => response.json())
       .then((responseData) => {
         if (responseData.status === 'success' && Array.isArray(responseData.data)) {
@@ -50,7 +53,7 @@ export const Habitacion = () => {
 
     fetch(endpoint, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify(formData),
     })
       .then((response) => response.json())
@@ -92,7 +95,7 @@ export const Habitacion = () => {
   // Eliminar habitacion
   const handleDelete = (id) => {
     if (window.confirm(`¿Estás seguro de que deseas eliminar la habitacion con ID: ${id}?`)) {
-      fetch(`${API_URL}/api/habitacion/${id}`, { method: 'DELETE' })
+      fetch(`${API_URL}/api/habitacion/${id}`, { method: 'DELETE', headers: getHeaders() })
         .then((response) => response.json())
         .then((responseData) => {
           if (responseData.status === 'success') {
