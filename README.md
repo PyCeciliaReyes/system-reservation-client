@@ -26,7 +26,7 @@ El sistema está diseñado para gestionar reservas de habitaciones con datos de 
 🚀 Enlace a Produccion
 
 La aplicacion esta desplegada en Netlify y accesible en el siguiente enlace:
-👉 **[Sistema de Reserva](https://systema-reservation.netlify.app/persona)**
+👉 **[Sistema de Reserva](https://systema-reservation.netlify.app)**
 
 ---
 
